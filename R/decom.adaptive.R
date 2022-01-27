@@ -59,7 +59,7 @@ decom.adaptive<-function(x,smooth=TRUE,thres=0.22,width=3){
   ##################################initilize parameters
   ##use adptive Gaussian
   ##first use gaussian to estimate the values
-  tre<-decom(x)
+  tre<-decom(x,smooth,width,thres)
   if (is.null(tre[[1]])){
 
     agu<-0.9*realind
@@ -142,5 +142,7 @@ decom.adaptive<-function(x,smooth=TRUE,thres=0.22,width=3){
 
     }
     return (list(rightfit,ga,pmi))
+  } else {
+    return (list(NULL))
   }
 }

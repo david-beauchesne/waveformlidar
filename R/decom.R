@@ -68,6 +68,7 @@ decom<-function(x,smooth=TRUE,width=3,thres=0.22){
   #peaknumber,it show the peaks' corresponding time
   imax<-max(y,na.rm=T)
   ind<-y[peaknumber]>thres*imax      #####################you need to change threshold##########################################
+  if (all(!ind)) stop("Review threshold argument, all peaks are below the identified threshold * maximum intensity")
   realind<-peaknumber[ind]#collect time
   newpeak<-y[realind]  #collect intensity
   z<-length(realind)
@@ -121,6 +122,8 @@ decom<-function(x,smooth=TRUE,width=3,thres=0.22){
       colnames(pmi) = c("index","A","u","sigma","A_std","u_std","sig_std")
     }
     return (list(rightfit,ga,pmi))
+  } else {
+    return (list(NULL))
   }
 }
 

@@ -1,4 +1,4 @@
-Package: waveformlidar
+Package: waveformlidarUL
 Type: Package
 Title: Waveform LiDAR Data Processing and Analysis
 Version: 1.2.5
