@@ -45,6 +45,7 @@ decom.adaptive<-function(x,smooth=TRUE,thres=0.22,width=3){
   #peaknumber,it show the peaks' corresponding time
   imax<-max(y,na.rm=T)
   ind<-y[peaknumber]>thres*imax      #####################you need to change threshold##########################################
+  if (all(!ind)) stop("Review threshold argument, all peaks are below the identified threshold * maximum intensity")
   realind<-peaknumber[ind]#collect time
   newpeak<-y[realind]  #collect intensity
   z<-length(realind)
