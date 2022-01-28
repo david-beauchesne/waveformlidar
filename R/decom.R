@@ -68,62 +68,66 @@ decom<-function(x,smooth=TRUE,width=3,thres=0.22){
   #peaknumber,it show the peaks' corresponding time
   imax<-max(y,na.rm=T)
   ind<-y[peaknumber]>thres*imax      #####################you need to change threshold##########################################
-  if (all(!ind)) stop("Review threshold argument, all peaks are below the identified threshold * maximum intensity")
-  realind<-peaknumber[ind]#collect time
-  newpeak<-y[realind]  #collect intensity
-  z<-length(realind)
-
-  #then we fliter peak we have in the waveform
-  #you must define newpeak as a list or a vector(one demision),otherwise it's just a value
-  #I just assume that intensity is larger than 45 can be seen as a peak, this can be changed
-
-  #####if the peak location is too close, remove it just keep one
-  #not sure we really need this step
-
-  ##################################initilize parameters
-  ###for normal Gaussian
-  gu<-realind
-  gi<-newpeak*2/3
-  gsd<-realind[1]/5
-  if (z>1){
-    gsd[2:z]<-diff(realind)/4
-  }
-
-  # start to fit use the auto generate formula
-
-    init0 <- gennls(gi, gu, gsd)
-
-  #init$formula
-  #init$start
-  df<-data.frame(x=seq_along(y),y)
-  log<-tryCatch(fit<-nlsLM(init0$formula,data=df,start=init0$start,algorithm='LM',control=nls.lm.control(factor=100,maxiter=1024,
-                          ftol = .Machine$double.eps, ptol = .Machine$double.eps),na.action=na.omit),error=function(e) NULL)#this maybe better
-  ###then you need to determine if this nls is sucessful or not?
-  if (!is.null(log)){
-    result=summary(fit)$parameters
-    pn<-sum(result[,1]>0)
-    rownum<-nrow(result);npeak<-rownum/3
-    #record the shot number of not good fit
-    rightfit<-NA;ga<-matrix(NA,rownum,5);#pmi<-matrix(NA,npeak,7)
-    ga<-cbind(index,result)
-    pmi<-NULL
-    if (pn==rownum){
-      rightfit<-index
-      #ga<-cbind(index,result)
-      ####directly get the parameters
-      ###make a matrix
-      pm<-matrix(NA,npeak,6)
-      pm[,1]<-result[1:npeak,1];pm[,4]<-result[1:npeak,2]
-      s2<-npeak+1;e2<-2*npeak
-      pm[,2]<-result[s2:e2,1];pm[,5]<-result[s2:e2,2]
-      s3<-2*npeak+1;e3<-3*npeak
-      pm[,3]<-result[s3:e3,1];pm[,6]<-result[s3:e3,2]
-      pmi<-cbind(index,pm)
-      colnames(pmi) = c("index","A","u","sigma","A_std","u_std","sig_std")
-    }
-    return (list(rightfit,ga,pmi))
-  } else {
+  # if (all(!ind)) stop("Review threshold argument, all peaks are below the identified threshold * maximum intensity")
+  if (all(!ind)) {
     return (list(NULL))
+  } else {
+    realind<-peaknumber[ind]#collect time
+    newpeak<-y[realind]  #collect intensity
+    z<-length(realind)
+
+    #then we fliter peak we have in the waveform
+    #you must define newpeak as a list or a vector(one demision),otherwise it's just a value
+    #I just assume that intensity is larger than 45 can be seen as a peak, this can be changed
+
+    #####if the peak location is too close, remove it just keep one
+    #not sure we really need this step
+
+    ##################################initilize parameters
+    ###for normal Gaussian
+    gu<-realind
+    gi<-newpeak*2/3
+    gsd<-realind[1]/5
+    if (z>1){
+      gsd[2:z]<-diff(realind)/4
+    }
+
+    # start to fit use the auto generate formula
+
+      init0 <- gennls(gi, gu, gsd)
+
+    #init$formula
+    #init$start
+    df<-data.frame(x=seq_along(y),y)
+    log<-tryCatch(fit<-nlsLM(init0$formula,data=df,start=init0$start,algorithm='LM',control=nls.lm.control(factor=100,maxiter=1024,
+                            ftol = .Machine$double.eps, ptol = .Machine$double.eps),na.action=na.omit),error=function(e) NULL)#this maybe better
+    ###then you need to determine if this nls is sucessful or not?
+    if (!is.null(log)){
+      result=summary(fit)$parameters
+      pn<-sum(result[,1]>0)
+      rownum<-nrow(result);npeak<-rownum/3
+      #record the shot number of not good fit
+      rightfit<-NA;ga<-matrix(NA,rownum,5);#pmi<-matrix(NA,npeak,7)
+      ga<-cbind(index,result)
+      pmi<-NULL
+      if (pn==rownum){
+        rightfit<-index
+        #ga<-cbind(index,result)
+        ####directly get the parameters
+        ###make a matrix
+        pm<-matrix(NA,npeak,6)
+        pm[,1]<-result[1:npeak,1];pm[,4]<-result[1:npeak,2]
+        s2<-npeak+1;e2<-2*npeak
+        pm[,2]<-result[s2:e2,1];pm[,5]<-result[s2:e2,2]
+        s3<-2*npeak+1;e3<-3*npeak
+        pm[,3]<-result[s3:e3,1];pm[,6]<-result[s3:e3,2]
+        pmi<-cbind(index,pm)
+        colnames(pmi) = c("index","A","u","sigma","A_std","u_std","sig_std")
+      }
+      return (list(rightfit,ga,pmi))
+    } else {
+      return (list(NULL))
+    }
   }
 }
 
